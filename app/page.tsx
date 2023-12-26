@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Dropzone from "react-dropzone";
 import { saveAs } from "file-saver";
 
@@ -14,22 +14,25 @@ const dropzoneStyle = {
   justifyContent: "center",
   cursor: "pointer",
 };
-const ImageEditor = () => {
-  const [image, setImage] = useState(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const canvasContext = useMemo(
-    () => canvasRef.current?.getContext("2d"),
-    [canvasRef]
-  );
+const ImageEditor = () => {
+  // const [image, setImage] = useState<HTMLImageElement>(new Image()); Why image is not defined?
+  const [image, setImage] = useState<HTMLImageElement>();
+  const [borderSize, setBorderSize] = useState(0);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const onDrop = (acceptedFiles: any) => {
     const file = acceptedFiles[0];
-    const image = new Image(300, 300);
+    const image = new Image();
     image.src = URL.createObjectURL(file);
 
     image.onload = () => {
-      canvasContext?.drawImage(image, 0, 0);
+      setImage(image);
+      if (canvasRef.current) {
+        canvasRef.current.width = image.width;
+        canvasRef.current.height = image.height;
+        canvasRef.current?.getContext("2d")?.drawImage(image, 0, 0);
+      }
     };
   };
 
@@ -39,6 +42,24 @@ const ImageEditor = () => {
       saveAs(imageUrl, "image.png");
     }
   };
+
+  useEffect(() => {
+    const ctx = canvasRef.current?.getContext("2d");
+
+    if (!canvasRef.current || !ctx || !image) {
+      return;
+    }
+
+    const newWidth = borderSize * 2 + (image?.width || 0);
+    const newHeight = borderSize * 2 + (image?.height || 0);
+
+    canvasRef.current.width = newWidth;
+    canvasRef.current.height = newHeight;
+    console.log({ newWidth });
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, newWidth, newHeight);
+    ctx.drawImage(image, borderSize, borderSize);
+  });
 
   return (
     <div>
@@ -54,7 +75,16 @@ const ImageEditor = () => {
       </Dropzone>
 
       <div>
-        <canvas ref={canvasRef} width={300} height={300} />
+        <input
+          type="range"
+          min={0}
+          max={300}
+          value={borderSize}
+          onChange={(e) => {
+            setBorderSize(Number(e.target.value));
+          }}
+        />
+        <canvas ref={canvasRef} width={100} height={100} />
         <button onClick={handleDownload}>Download Edited Image</button>
       </div>
     </div>
