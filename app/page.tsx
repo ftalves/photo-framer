@@ -27,8 +27,10 @@ const ImageEditor = () => {
   const [image, setImage] = useState<HTMLImageElement>();
   const [canvasWidth, setCanvasWidth] = useState(0);
   const [canvasHeight, setCanvasHeight] = useState(0);
+  const [lockProportions, setLockProportions] = useState(true);
   const [backgroundColor, setBackgroundColor] = useState("#000");
   const [format, setFormat] = useState("jpg");
+  const [proportionRatio, setProportionRatio] = useState(1);
 
   const onDrop = (acceptedFiles: any) => {
     const file = acceptedFiles[0];
@@ -37,6 +39,10 @@ const ImageEditor = () => {
 
     image.onload = () => {
       setImage(image);
+      setCanvasWidth(image.width);
+      setCanvasHeight(image.height);
+      setProportionRatio(image.width / image.height);
+
       if (canvasRef.current) {
         canvasRef.current.width = image.width;
         canvasRef.current.height = image.height;
@@ -111,6 +117,7 @@ const ImageEditor = () => {
 
             setCanvasWidth(width);
             setCanvasHeight(height);
+            setProportionRatio(width / height);
           }}
         >
           <option value="">Original</option>
@@ -118,6 +125,39 @@ const ImageEditor = () => {
           <option value="insta-portrait">Portrait</option>
           <option value="insta-square">Square</option>
         </select>
+        <div>
+          <input
+            type="number"
+            value={canvasWidth}
+            onChange={(e) => {
+              const newWidth = Number(e.target.value);
+
+              setCanvasWidth(newWidth);
+              if (lockProportions) {
+                setCanvasHeight(Math.ceil(newWidth / proportionRatio));
+              }
+            }}
+          />
+          <input
+            type="number"
+            value={canvasHeight}
+            onChange={(e) => {
+              const newHeight = Number(e.target.value);
+
+              setCanvasHeight(newHeight);
+              if (lockProportions) {
+                setCanvasWidth(Math.ceil(newHeight * proportionRatio));
+              }
+            }}
+          />
+          <input
+            type="checkbox"
+            checked={lockProportions}
+            onChange={() => {
+              setLockProportions(!lockProportions);
+            }}
+          />
+        </div>
         <canvas ref={canvasRef} width={100} height={100} />
         <button onClick={handleDownload}>Download Edited Image</button>
       </div>
