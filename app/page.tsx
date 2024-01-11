@@ -22,12 +22,13 @@ const MAP_ASPECT_PRESET_TO_DIMENSIONS: { [key: string]: number[] } = {
 };
 
 const ImageEditor = () => {
-  // const [image, setImage] = useState<HTMLImageElement>(new Image()); Why image is not defined?
-  const [image, setImage] = useState<HTMLImageElement>();
-  const [borderSize, setBorderSize] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [aspectPreset, setAspectPreset] = useState("");
-  const initialImageDimensions = useRef([0, 0]);
+
+  const [image, setImage] = useState<HTMLImageElement>();
+  const [canvasWidth, setCanvasWidth] = useState(0);
+  const [canvasHeight, setCanvasHeight] = useState(0);
+  const [backgroundColor, setBackgroundColor] = useState("#000");
+  const [format, setFormat] = useState("jpg");
 
   const onDrop = (acceptedFiles: any) => {
     const file = acceptedFiles[0];
@@ -40,16 +41,8 @@ const ImageEditor = () => {
         canvasRef.current.width = image.width;
         canvasRef.current.height = image.height;
         canvasRef.current?.getContext("2d")?.drawImage(image, 0, 0);
-        initialImageDimensions.current = [image.width, image.height];
       }
     };
-  };
-
-  const handleDownload = () => {
-    const imageUrl = canvasRef.current?.toDataURL("image/png") || null;
-    if (imageUrl) {
-      saveAs(imageUrl, "image.png");
-    }
   };
 
   useEffect(() => {
@@ -61,29 +54,39 @@ const ImageEditor = () => {
 
     const imageWidth = image?.width || 0;
     const imageHeight = image?.height || 0;
-    const [maxWidth, maxHeight] =
-      MAP_ASPECT_PRESET_TO_DIMENSIONS[aspectPreset] ||
-      initialImageDimensions.current;
+
+    const maxWidth = canvasWidth || image.width;
+    const maxHeight = canvasHeight || image.height;
 
     canvasRef.current.width = maxWidth;
     canvasRef.current.height = maxHeight;
 
-    const imgScale = Math.min(maxWidth / imageWidth, maxHeight / imageHeight);
+    // The proportion the image will need to grow / shrink in order to fit in the chosen aspect ratio
+    const sizeProportion = Math.min(
+      maxWidth / imageWidth,
+      maxHeight / imageHeight
+    );
 
-    const newImgWidth = imageWidth * imgScale; //borderSize * 2 + imageWidth;
-    const newImgHeight = imageHeight * imgScale; //borderSize * 2 + imageHeight;
+    const newImageWidth = imageWidth * sizeProportion;
+    const newImageHeight = imageHeight * sizeProportion;
 
-    ctx.fillStyle = "black";
+    ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, maxWidth, maxHeight);
-
     ctx.drawImage(
       image,
-      maxWidth / 2 - newImgWidth / 2,
-      maxHeight / 2 - newImgHeight / 2,
-      newImgWidth,
-      newImgHeight
+      maxWidth / 2 - newImageWidth / 2,
+      maxHeight / 2 - newImageHeight / 2,
+      newImageWidth,
+      newImageHeight
     );
-  }, [image, aspectPreset]);
+  }, [image, canvasWidth, canvasHeight, backgroundColor]);
+
+  const handleDownload = () => {
+    const imageUrl = canvasRef.current?.toDataURL(`image/${format}}`) || null;
+    if (imageUrl) {
+      saveAs(imageUrl, `image.${format}`);
+    }
+  };
 
   return (
     <div>
@@ -101,22 +104,20 @@ const ImageEditor = () => {
       <div>
         <select
           name="aspect-ratio"
-          onChange={(e) => setAspectPreset(e.target.value)}
+          onChange={(e) => {
+            const [width, height] = MAP_ASPECT_PRESET_TO_DIMENSIONS[
+              e.target.value
+            ] || [image?.width, image?.height];
+
+            setCanvasWidth(width);
+            setCanvasHeight(height);
+          }}
         >
           <option value="">Original</option>
           <option value="insta-story">Story</option>
           <option value="insta-portrait">Portrait</option>
           <option value="insta-square">Square</option>
         </select>
-        {/* <input
-          type="range"
-          min={0}
-          max={300}
-          value={borderSize}
-          onChange={(e) => {
-            setBorderSize(Number(e.target.value));
-          }}
-        /> */}
         <canvas ref={canvasRef} width={100} height={100} />
         <button onClick={handleDownload}>Download Edited Image</button>
       </div>
