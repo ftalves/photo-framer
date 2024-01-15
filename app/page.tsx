@@ -25,8 +25,10 @@ const ImageEditor = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [image, setImage] = useState<HTMLImageElement>();
-  const [canvasWidth, setCanvasWidth] = useState(0);
-  const [canvasHeight, setCanvasHeight] = useState(0);
+  const [canvasDimensions, setCanvasDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
   const [lockProportions, setLockProportions] = useState(true);
   const [backgroundColor, setBackgroundColor] = useState("#000");
   const [format, setFormat] = useState("jpg");
@@ -39,8 +41,7 @@ const ImageEditor = () => {
 
     image.onload = () => {
       setImage(image);
-      setCanvasWidth(image.width);
-      setCanvasHeight(image.height);
+      setCanvasDimensions({ width: image.width, height: image.height });
       setProportionRatio(image.width / image.height);
 
       if (canvasRef.current) {
@@ -61,8 +62,8 @@ const ImageEditor = () => {
     const imageWidth = image?.width || 0;
     const imageHeight = image?.height || 0;
 
-    const maxWidth = canvasWidth || image.width;
-    const maxHeight = canvasHeight || image.height;
+    const maxWidth = canvasDimensions.width || image.width;
+    const maxHeight = canvasDimensions.height || image.height;
 
     canvasRef.current.width = maxWidth;
     canvasRef.current.height = maxHeight;
@@ -85,7 +86,7 @@ const ImageEditor = () => {
       newImageWidth,
       newImageHeight
     );
-  }, [image, canvasWidth, canvasHeight, backgroundColor]);
+  }, [image, canvasDimensions, backgroundColor]);
 
   const handleDownload = () => {
     const imageUrl = canvasRef.current?.toDataURL(`image/${format}}`) || null;
@@ -115,8 +116,7 @@ const ImageEditor = () => {
               e.target.value
             ] || [image?.width, image?.height];
 
-            setCanvasWidth(width);
-            setCanvasHeight(height);
+            setCanvasDimensions({ width, height });
             setProportionRatio(width / height);
           }}
         >
@@ -128,26 +128,28 @@ const ImageEditor = () => {
         <div>
           <input
             type="number"
-            value={canvasWidth}
+            value={canvasDimensions.width}
             onChange={(e) => {
               const newWidth = Number(e.target.value);
-
-              setCanvasWidth(newWidth);
-              if (lockProportions) {
-                setCanvasHeight(Math.ceil(newWidth / proportionRatio));
-              }
+              setCanvasDimensions({
+                width: newWidth,
+                height: lockProportions
+                  ? Math.ceil(newWidth / proportionRatio)
+                  : canvasDimensions.height,
+              });
             }}
           />
           <input
             type="number"
-            value={canvasHeight}
+            value={canvasDimensions.height}
             onChange={(e) => {
               const newHeight = Number(e.target.value);
-
-              setCanvasHeight(newHeight);
-              if (lockProportions) {
-                setCanvasWidth(Math.ceil(newHeight * proportionRatio));
-              }
+              setCanvasDimensions({
+                height: newHeight,
+                width: lockProportions
+                  ? Math.ceil(newHeight / proportionRatio)
+                  : canvasDimensions.width,
+              });
             }}
           />
           <input
@@ -155,6 +157,10 @@ const ImageEditor = () => {
             checked={lockProportions}
             onChange={() => {
               setLockProportions(!lockProportions);
+              setCanvasDimensions({
+                width: canvasDimensions.width,
+                height: Math.ceil(canvasDimensions.width / proportionRatio),
+              });
             }}
           />
         </div>
