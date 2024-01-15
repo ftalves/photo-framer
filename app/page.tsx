@@ -109,8 +109,9 @@ const ImageEditor = () => {
       </Dropzone>
 
       <div>
+        <label htmlFor={"aspect-ratio"}>Aspect Ratio</label>
         <select
-          name="aspect-ratio"
+          id="aspect-ratio"
           onChange={(e) => {
             const [width, height] = MAP_ASPECT_PRESET_TO_DIMENSIONS[
               e.target.value
