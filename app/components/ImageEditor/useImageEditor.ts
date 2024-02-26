@@ -25,9 +25,11 @@ const useImageEditor = () => {
   const setImageDimensions = ({
     width,
     height,
+    lockProportions,
   }: {
     width?: number;
     height?: number;
+    lockProportions: boolean;
   }) => {
     if (!width && !height) {
       return;
@@ -38,17 +40,64 @@ const useImageEditor = () => {
 
     if (!newWidth) {
       newWidth = lockProportions
-        ? Math.ceil(newHeight! / proportionRatio)
-        : canvasDimensions.height;
+        ? Math.ceil(newHeight! * proportionRatio)
+        : canvasDimensions.width;
     }
 
     if (!newHeight) {
       newHeight = lockProportions
-        ? Math.ceil(newWidth! / proportionRatio)
+        ? Math.floor(newWidth! / proportionRatio)
         : canvasDimensions.height;
     }
 
     setCanvasDimensions({ width: newWidth, height: newHeight });
+  };
+
+  const toggleLockProportions = () => {
+    const nextLockProportions = !lockProportions;
+
+    setLockProportions(nextLockProportions);
+    if (nextLockProportions) {
+      setImageDimensions({
+        width: canvasDimensions.width,
+        lockProportions: nextLockProportions,
+      });
+    }
+  };
+
+  const handleDownload = () => {
+    const imageUrl = canvasRef.current?.toDataURL(`image/${format}}`) || null;
+    if (imageUrl) {
+      saveAs(imageUrl, `image.${format}`);
+    }
+  };
+
+  const handleFileDrop = (acceptedFiles: any) => {
+    const file = acceptedFiles[0];
+    const image = new Image();
+    image.src = URL.createObjectURL(file);
+
+    image.onload = () => {
+      setImage(image);
+      setCanvasDimensions({ width: image.width, height: image.height });
+      setProportionRatio(image.width / image.height);
+
+      if (canvasRef.current) {
+        canvasRef.current.width = image.width;
+        canvasRef.current.height = image.height;
+        canvasRef.current?.getContext("2d")?.drawImage(image, 0, 0);
+      }
+    };
+  };
+
+  const handleAspectRatioChange = (newPreset: string) => {
+    const [width, height] = MAP_ASPECT_PRESET_TO_DIMENSIONS[newPreset] || [
+      image?.width,
+      image?.height,
+    ];
+
+    setImageDimensions({ width, height, lockProportions });
+    setProportionRatio(width / height);
   };
 
   useEffect(() => {
@@ -87,53 +136,12 @@ const useImageEditor = () => {
     );
   }, [image, canvasDimensions, backgroundColor]);
 
-  useEffect(() => {
-    if (lockProportions) {
-      setImageDimensions({ width: canvasDimensions.width });
-    }
-  }, [lockProportions]);
-
-  const handleDownload = () => {
-    const imageUrl = canvasRef.current?.toDataURL(`image/${format}}`) || null;
-    if (imageUrl) {
-      saveAs(imageUrl, `image.${format}`);
-    }
-  };
-
-  const handleFileDrop = (acceptedFiles: any) => {
-    const file = acceptedFiles[0];
-    const image = new Image();
-    image.src = URL.createObjectURL(file);
-
-    image.onload = () => {
-      setImage(image);
-      setCanvasDimensions({ width: image.width, height: image.height });
-      setProportionRatio(image.width / image.height);
-
-      if (canvasRef.current) {
-        canvasRef.current.width = image.width;
-        canvasRef.current.height = image.height;
-        canvasRef.current?.getContext("2d")?.drawImage(image, 0, 0);
-      }
-    };
-  };
-
-  const handleAspectRatioChange = (newPreset: string) => {
-    const [width, height] = MAP_ASPECT_PRESET_TO_DIMENSIONS[newPreset] || [
-      image?.width,
-      image?.height,
-    ];
-
-    setImageDimensions({ width, height });
-    setProportionRatio(width / height);
-  };
-
   return {
     canvasRef,
     imageDimensions: canvasDimensions,
     setImageDimensions,
     lockProportions,
-    setLockProportions,
+    toggleLockProportions,
     handleFileDrop,
     handleDownload,
     handleAspectRatioChange,

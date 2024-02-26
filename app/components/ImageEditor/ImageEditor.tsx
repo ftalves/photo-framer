@@ -21,7 +21,7 @@ const ImageEditor = () => {
     imageDimensions,
     setImageDimensions,
     lockProportions,
-    setLockProportions,
+    toggleLockProportions,
     handleFileDrop,
     handleAspectRatioChange,
     handleDownload,
@@ -56,20 +56,26 @@ const ImageEditor = () => {
             type="number"
             value={imageDimensions.width}
             onChange={(e) =>
-              setImageDimensions({ width: Number(e.target.value) })
+              setImageDimensions({
+                width: Number(e.target.value),
+                lockProportions,
+              })
             }
           />
           <input
             type="number"
             value={imageDimensions.height}
             onChange={(e) =>
-              setImageDimensions({ height: Number(e.target.value) })
+              setImageDimensions({
+                height: Number(e.target.value),
+                lockProportions,
+              })
             }
           />
           <input
             type="checkbox"
             checked={lockProportions}
-            onChange={() => setLockProportions(!lockProportions)}
+            onChange={toggleLockProportions}
           />
         </div>
         <canvas ref={canvasRef} width={100} height={100} />
