@@ -72,7 +72,7 @@ const useImageEditor = () => {
     }
   };
 
-  const handleFileDrop = (acceptedFiles: any) => {
+  const handleFileUpload = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     const image = new Image();
     image.src = URL.createObjectURL(file);
@@ -142,7 +142,7 @@ const useImageEditor = () => {
     setImageDimensions,
     lockProportions,
     toggleLockProportions,
-    handleFileDrop,
+    handleFileUpload,
     handleDownload,
     handleAspectRatioChange,
   };

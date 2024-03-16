@@ -22,7 +22,7 @@ const ImageEditor = () => {
     setImageDimensions,
     lockProportions,
     toggleLockProportions,
-    handleFileDrop,
+    handleFileUpload,
     handleAspectRatioChange,
     handleDownload,
   } = useImageEditor();
@@ -31,7 +31,7 @@ const ImageEditor = () => {
     <div>
       <h1>Image Editor</h1>
 
-      <Dropzone onDrop={handleFileDrop}>
+      <Dropzone onDrop={handleFileUpload}>
         {({ getRootProps, getInputProps }) => (
           <div {...getRootProps()} style={dropzoneStyle}>
             <input {...getInputProps()} />
