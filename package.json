@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "static": "next build && touch ./docs/.nojekyll",
+    "static": "BUILD_DIR=docs next build && touch ./docs/.nojekyll",
     "start": "next start",
     "lint": "next lint",
     "test": "jest"
