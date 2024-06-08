@@ -2,7 +2,7 @@
 const nextConfig = {
   output: 'export',
   distDir: process.env.BUILD_DIR || '.next',
-  assetPrefix: '/photo-framer',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/photo-framer' : '/',
 };
 
 module.exports = nextConfig;
