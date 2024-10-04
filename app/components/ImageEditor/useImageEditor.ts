@@ -2,6 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { saveAs } from 'file-saver';
+import {
+  getImageCanvasCoords,
+  getProportionalHeight,
+  getProportionalWidth,
+  getSizeProportion,
+} from './utils';
 
 const MAP_ASPECT_PRESET_TO_DIMENSIONS: { [key: string]: number[] } = {
   'insta-story': [1080, 1920],
@@ -19,60 +25,19 @@ const useImageEditor = () => {
   });
   const [lockProportions, setLockProportions] = useState(true);
   const [backgroundColor, setBackgroundColor] = useState('#000');
-  const [format, setFormat] = useState('jpg');
+  const [format, setFormat] = useState('jpeg');
   const [proportionRatio, setProportionRatio] = useState(1);
 
-  const setImageDimensions = ({
-    width,
-    height,
-    lockProportions,
-  }: {
-    width?: number;
-    height?: number;
-    lockProportions: boolean;
-  }) => {
-    if (!width && !height) {
-      return;
-    }
-
-    let newWidth = width;
-    let newHeight = height;
-
-    if (!newWidth) {
-      newWidth = lockProportions
-        ? Math.ceil(newHeight! * proportionRatio)
-        : canvasDimensions.width;
-    }
-
-    if (!newHeight) {
-      newHeight = lockProportions
-        ? Math.floor(newWidth! / proportionRatio)
-        : canvasDimensions.height;
-    }
-
-    setCanvasDimensions({ width: newWidth, height: newHeight });
-  };
-
-  const toggleLockProportions = () => {
-    const nextLockProportions = !lockProportions;
-
-    setLockProportions(nextLockProportions);
-    if (nextLockProportions) {
-      setImageDimensions({
-        width: canvasDimensions.width,
-        lockProportions: nextLockProportions,
-      });
-    }
-  };
-
   const handleDownload = () => {
-    const imageUrl = canvasRef.current?.toDataURL(`image/${format}}`) || null;
-    if (imageUrl) {
-      saveAs(imageUrl, `image.${format}`);
-    }
+    //TODO: delegate to a web worker
+    canvasRef.current?.toBlob((blob) => {
+      if (blob) {
+        saveAs(blob, `image.${format}`);
+      }
+    }, `image/${format}`);
   };
 
-  const handleFileUpload = (acceptedFiles: File[]) => {
+  const handleUpload = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     const image = new Image();
     image.src = URL.createObjectURL(file);
@@ -90,15 +55,44 @@ const useImageEditor = () => {
     };
   };
 
+  const setWidth = (width: number) => {
+    setCanvasDimensions({
+      width,
+      height: lockProportions
+        ? getProportionalHeight(width, proportionRatio)
+        : canvasDimensions.height,
+    });
+  };
+
+  const setHeight = (height: number) => {
+    setCanvasDimensions({
+      height,
+      width: lockProportions
+        ? getProportionalWidth(height, proportionRatio)
+        : canvasDimensions.width,
+    });
+  };
+
   const handleAspectRatioChange = (newPreset: string) => {
     const [width, height] = MAP_ASPECT_PRESET_TO_DIMENSIONS[newPreset] || [
       image?.width,
       image?.height,
     ];
 
-    setImageDimensions({ width, height, lockProportions });
+    // setCanvasDimensions({ width, height });
     setProportionRatio(width / height);
   };
+
+  // Update the width when the lockProportions is toggled
+  useEffect(() => {
+    if (lockProportions) {
+      setWidth(canvasDimensions.width);
+    }
+  }, [lockProportions]);
+
+  useEffect(() => {
+    setWidth(canvasDimensions.width);
+  }, [proportionRatio]);
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext('2d');
@@ -110,39 +104,46 @@ const useImageEditor = () => {
     const imageWidth = image?.width || 0;
     const imageHeight = image?.height || 0;
 
+    // Max dimensions defined by aspect ratio preset
     const maxWidth = canvasDimensions.width || image.width;
     const maxHeight = canvasDimensions.height || image.height;
 
+    // Resize the canvas to match the preset
     canvasRef.current.width = maxWidth;
     canvasRef.current.height = maxHeight;
 
-    // The proportion the image will need to grow / shrink in order to fit in the chosen aspect ratio
-    const sizeProportion = Math.min(
-      maxWidth / imageWidth,
-      maxHeight / imageHeight
+    // The proportion the image will need to grow / shrink in order to fit in the chosen preset
+    const sizeProportion = getSizeProportion(
+      imageWidth,
+      imageHeight,
+      maxWidth,
+      maxHeight
     );
 
     const newImageWidth = imageWidth * sizeProportion;
     const newImageHeight = imageHeight * sizeProportion;
 
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, maxWidth, maxHeight);
-    ctx.drawImage(
-      image,
-      maxWidth / 2 - newImageWidth / 2,
-      maxHeight / 2 - newImageHeight / 2,
+    const coords = getImageCanvasCoords(
+      maxWidth,
+      maxHeight,
       newImageWidth,
       newImageHeight
     );
+
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, maxWidth, maxHeight);
+    ctx.drawImage(image, coords.x, coords.y, newImageWidth, newImageHeight);
   }, [image, canvasDimensions, backgroundColor]);
 
   return {
+    image,
     canvasRef,
     imageDimensions: canvasDimensions,
-    setImageDimensions,
     lockProportions,
-    toggleLockProportions,
-    handleFileUpload,
+    setLockProportions,
+    setWidth,
+    setHeight,
+    handleUpload,
     handleDownload,
     handleAspectRatioChange,
   };
