@@ -2,8 +2,8 @@
 
 import Dropzone from 'react-dropzone';
 
-import { useImageEditor } from './useImageEditor';
 import { DROPZONE_TEST_ID, IMAGE_EDITOR_TEST_ID } from '@/app/utils/testIds';
+import { useImageEditor } from './useImageEditor';
 
 const dropzoneStyle = {
   width: '100%',

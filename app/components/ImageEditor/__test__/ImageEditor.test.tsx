@@ -1,7 +1,7 @@
 import { render, RenderResult } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import { ImageEditor } from '../ImageEditor';
+
 import { DROPZONE_TEST_ID } from '@/app/utils/testIds';
+import { ImageEditor } from '../ImageEditor';
 
 describe('ImageEditor', () => {
   let editorComponent: RenderResult;

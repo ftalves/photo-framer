@@ -2,18 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { saveAs } from 'file-saver';
+
+import { MAP_ASPECT_PRESET_TO_DIMENSIONS } from '@/app/utils/constants';
+
 import {
   getImageCanvasCoords,
   getProportionalHeight,
   getProportionalWidth,
   getSizeProportion,
 } from './utils';
-
-const MAP_ASPECT_PRESET_TO_DIMENSIONS: { [key: string]: number[] } = {
-  'insta-story': [1080, 1920],
-  'insta-portrait': [1080, 1350],
-  'insta-square': [1080, 1080],
-};
 
 const useImageEditor = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -79,7 +76,6 @@ const useImageEditor = () => {
       image?.height,
     ];
 
-    // setCanvasDimensions({ width, height });
     setProportionRatio(width / height);
   };
 
@@ -88,10 +84,12 @@ const useImageEditor = () => {
     if (lockProportions) {
       setWidth(canvasDimensions.width);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lockProportions]);
 
   useEffect(() => {
     setWidth(canvasDimensions.width);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [proportionRatio]);
 
   useEffect(() => {
