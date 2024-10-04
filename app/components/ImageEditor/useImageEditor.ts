@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import { saveAs } from "file-saver";
+import { useEffect, useRef, useState } from 'react';
+import { saveAs } from 'file-saver';
 
 const MAP_ASPECT_PRESET_TO_DIMENSIONS: { [key: string]: number[] } = {
-  "insta-story": [1080, 1920],
-  "insta-portrait": [1080, 1350],
-  "insta-square": [1080, 1080],
+  'insta-story': [1080, 1920],
+  'insta-portrait': [1080, 1350],
+  'insta-square': [1080, 1080],
 };
 
 const useImageEditor = () => {
@@ -18,8 +18,8 @@ const useImageEditor = () => {
     height: 0,
   });
   const [lockProportions, setLockProportions] = useState(true);
-  const [backgroundColor, setBackgroundColor] = useState("#000");
-  const [format, setFormat] = useState("jpg");
+  const [backgroundColor, setBackgroundColor] = useState('#000');
+  const [format, setFormat] = useState('jpg');
   const [proportionRatio, setProportionRatio] = useState(1);
 
   const setImageDimensions = ({
@@ -85,7 +85,7 @@ const useImageEditor = () => {
       if (canvasRef.current) {
         canvasRef.current.width = image.width;
         canvasRef.current.height = image.height;
-        canvasRef.current?.getContext("2d")?.drawImage(image, 0, 0);
+        canvasRef.current?.getContext('2d')?.drawImage(image, 0, 0);
       }
     };
   };
@@ -101,7 +101,7 @@ const useImageEditor = () => {
   };
 
   useEffect(() => {
-    const ctx = canvasRef.current?.getContext("2d");
+    const ctx = canvasRef.current?.getContext('2d');
 
     if (!canvasRef.current || !ctx || !image) {
       return;

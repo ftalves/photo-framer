@@ -1,18 +1,19 @@
-"use client";
+'use client';
 
-import Dropzone from "react-dropzone";
+import Dropzone from 'react-dropzone';
 
-import { useImageEditor } from "./useImageEditor";
+import { useImageEditor } from './useImageEditor';
+import { DROPZONE_TEST_ID } from '@/app/utils/testIds';
 
 const dropzoneStyle = {
-  width: "100%",
-  height: "100px",
-  border: "2px dashed #ccc",
-  borderRadius: "4px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  cursor: "pointer",
+  width: '100%',
+  height: '100px',
+  border: '2px dashed #ccc',
+  borderRadius: '4px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
 };
 
 const ImageEditor = () => {
@@ -33,7 +34,11 @@ const ImageEditor = () => {
 
       <Dropzone onDrop={handleFileUpload}>
         {({ getRootProps, getInputProps }) => (
-          <div {...getRootProps()} style={dropzoneStyle}>
+          <div
+            {...getRootProps()}
+            style={dropzoneStyle}
+            data-testid={DROPZONE_TEST_ID}
+          >
             <input {...getInputProps()} />
             <p>Drag n drop an image here, or click to select one</p>
           </div>
@@ -41,7 +46,7 @@ const ImageEditor = () => {
       </Dropzone>
 
       <div>
-        <label htmlFor={"aspect-ratio"}>Aspect Ratio</label>
+        <label htmlFor={'aspect-ratio'}>Aspect Ratio</label>
         <select
           id="aspect-ratio"
           onChange={(e) => handleAspectRatioChange(e.target.value)}
