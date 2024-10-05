@@ -1,21 +1,25 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { saveAs } from 'file-saver';
+import { RefObject, useEffect, useState } from 'react';
 
 import { MAP_ASPECT_PRESET_TO_DIMENSIONS } from '@/app/utils/constants';
-
 import {
   getImageCanvasCoords,
   getProportionalHeight,
   getProportionalWidth,
   getSizeProportion,
-} from './utils';
+} from '@/app/components/Framer/utils';
+import { AspectRatio } from '@/app/components/Framer/types';
 
-const useImageEditor = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+interface UseImageEditorProps {
+  image: HTMLImageElement;
+  aspectRatio: AspectRatio;
+  canvasRef: RefObject<HTMLCanvasElement>;
+}
 
-  const [image, setImage] = useState<HTMLImageElement>();
+export const useImageEditor = (props: UseImageEditorProps) => {
+  const { image, aspectRatio, canvasRef } = props;
+
   const [canvasDimensions, setCanvasDimensions] = useState({
     width: 0,
     height: 0,
@@ -24,33 +28,6 @@ const useImageEditor = () => {
   const [backgroundColor, setBackgroundColor] = useState('#000');
   const [format, setFormat] = useState('jpeg');
   const [proportionRatio, setProportionRatio] = useState(1);
-
-  const handleDownload = () => {
-    //TODO: delegate to a web worker
-    canvasRef.current?.toBlob((blob) => {
-      if (blob) {
-        saveAs(blob, `image.${format}`);
-      }
-    }, `image/${format}`);
-  };
-
-  const handleUpload = (acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    const image = new Image();
-    image.src = URL.createObjectURL(file);
-
-    image.onload = () => {
-      setImage(image);
-      setCanvasDimensions({ width: image.width, height: image.height });
-      setProportionRatio(image.width / image.height);
-
-      if (canvasRef.current) {
-        canvasRef.current.width = image.width;
-        canvasRef.current.height = image.height;
-        canvasRef.current?.getContext('2d')?.drawImage(image, 0, 0);
-      }
-    };
-  };
 
   const setWidth = (width: number) => {
     setCanvasDimensions({
@@ -70,26 +47,39 @@ const useImageEditor = () => {
     });
   };
 
-  const handleAspectRatioChange = (newPreset: string) => {
-    const [width, height] = MAP_ASPECT_PRESET_TO_DIMENSIONS[newPreset] || [
-      image?.width,
-      image?.height,
-    ];
+  useEffect(() => {
+    image.onload = () => {
+      setCanvasDimensions({ width: image.width, height: image.height });
+      setProportionRatio(image.width / image.height);
+
+      if (canvasRef.current) {
+        canvasRef.current.width = image.width;
+        canvasRef.current.height = image.height;
+        canvasRef.current?.getContext('2d')?.drawImage(image, 0, 0);
+      }
+    };
+    /** eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, []);
+
+  useEffect(() => {
+    const [width, height] = aspectRatio
+      ? MAP_ASPECT_PRESET_TO_DIMENSIONS[aspectRatio]
+      : [image?.width, image?.height];
 
     setProportionRatio(width / height);
-  };
+    /** eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [aspectRatio]);
 
-  // Update the width when the lockProportions is toggled
   useEffect(() => {
     if (lockProportions) {
       setWidth(canvasDimensions.width);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    /** eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [lockProportions]);
 
   useEffect(() => {
     setWidth(canvasDimensions.width);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    /** eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [proportionRatio]);
 
   useEffect(() => {
@@ -141,10 +131,5 @@ const useImageEditor = () => {
     setLockProportions,
     setWidth,
     setHeight,
-    handleUpload,
-    handleDownload,
-    handleAspectRatioChange,
   };
 };
-
-export { useImageEditor };

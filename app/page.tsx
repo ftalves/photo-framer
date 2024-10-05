@@ -1,9 +1,9 @@
-import { ImageEditor } from "./components/ImageEditor";
+import { Framer } from './components/Framer';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <ImageEditor />
+    <main className="flex min-h-screen flex-row p-24">
+      <Framer />
     </main>
   );
 }

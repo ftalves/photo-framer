@@ -1,13 +1,13 @@
 import { render, RenderResult } from '@testing-library/react';
 
 import { DROPZONE_TEST_ID } from '@/app/utils/testIds';
-import { ImageEditor } from '../ImageEditor';
+import { Framer } from '../Framer';
 
-describe('ImageEditor', () => {
+describe('Framer', () => {
   let editorComponent: RenderResult;
 
   beforeEach(() => {
-    editorComponent = render(<ImageEditor />);
+    editorComponent = render(<Framer />);
   });
 
   describe('File upload', () => {
