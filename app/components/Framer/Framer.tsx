@@ -5,7 +5,8 @@ import Dropzone from 'react-dropzone';
 import { saveAs } from 'file-saver';
 
 import { DROPZONE_TEST_ID } from '@/app/utils/testIds';
-import { AspectRatio } from './types';
+import { MAP_EXPORT_FORMAT_TO_LABEL } from '@/app/utils/constants';
+import { AspectRatio, ExportFormat } from './types';
 import { ImageEditor } from './subcomponents';
 
 const dropzoneStyle = {
@@ -22,6 +23,8 @@ const dropzoneStyle = {
 export const Framer = () => {
   const [images, setImages] = useState<HTMLImageElement[]>();
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('');
+  const [format, setFormat] = useState<ExportFormat>('jpeg');
+
   const canvasRefs = useRef<HTMLCanvasElement[]>([]);
 
   const handleUpload = (acceptedFiles: File[]) => {
@@ -43,9 +46,9 @@ export const Framer = () => {
       //TODO: delegate to a web worker
       canvasRef.toBlob((blob) => {
         if (blob) {
-          saveAs(blob, `image.jpeg}`);
+          saveAs(blob, `image.${format}}`);
         }
-      }, `image/jpeg`);
+      }, `image/${format}`);
     });
   };
 
@@ -76,6 +79,20 @@ export const Framer = () => {
           <option value="insta-story">Story</option>
           <option value="insta-portrait">Portrait</option>
           <option value="insta-square">Square</option>
+        </select>
+
+        <label htmlFor={'format'}>Export Format</label>
+        <select
+          id="format"
+          onChange={(e) => setFormat(e.target.value as ExportFormat)}
+        >
+          {(Object.keys(MAP_EXPORT_FORMAT_TO_LABEL) as Array<ExportFormat>).map(
+            (format) => (
+              <option key={format} value={format}>
+                {MAP_EXPORT_FORMAT_TO_LABEL[format]}
+              </option>
+            )
+          )}
         </select>
 
         <button onClick={handleDownload}>Download Edited Images</button>

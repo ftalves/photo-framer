@@ -26,7 +26,6 @@ export const useImageEditor = (props: UseImageEditorProps) => {
   });
   const [lockProportions, setLockProportions] = useState(true);
   const [backgroundColor, setBackgroundColor] = useState('#000');
-  const [format, setFormat] = useState('jpeg');
   const [proportionRatio, setProportionRatio] = useState(1);
 
   const setWidth = (width: number) => {
