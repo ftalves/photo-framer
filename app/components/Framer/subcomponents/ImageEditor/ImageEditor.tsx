@@ -27,12 +27,12 @@ export const ImageEditor = forwardRef(
         <div>
           <input
             type="number"
-            value={imageDimensions.width}
+            value={imageDimensions.width || 0}
             onChange={(e) => setWidth(Number(e.target.value))}
           />
           <input
             type="number"
-            value={imageDimensions.height}
+            value={imageDimensions.height || 0}
             onChange={(e) => setHeight(Number(e.target.value))}
           />
           <input

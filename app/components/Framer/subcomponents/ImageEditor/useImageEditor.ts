@@ -4,10 +4,9 @@ import { RefObject, useEffect, useState } from 'react';
 
 import { MAP_ASPECT_PRESET_TO_DIMENSIONS } from '@/app/utils/constants';
 import {
-  getImageCanvasCoords,
+  drawImageOnCanvas,
   getProportionalHeight,
   getProportionalWidth,
-  getSizeProportion,
 } from '@/app/components/Framer/utils';
 import { AspectRatio } from '@/app/components/Framer/types';
 
@@ -82,44 +81,7 @@ export const useImageEditor = (props: UseImageEditorProps) => {
   }, [proportionRatio]);
 
   useEffect(() => {
-    const ctx = canvasRef.current?.getContext('2d');
-
-    if (!canvasRef.current || !ctx || !image) {
-      return;
-    }
-
-    const imageWidth = image?.width || 0;
-    const imageHeight = image?.height || 0;
-
-    // Max dimensions defined by aspect ratio preset
-    const maxWidth = canvasDimensions.width || image.width;
-    const maxHeight = canvasDimensions.height || image.height;
-
-    // Resize the canvas to match the preset
-    canvasRef.current.width = maxWidth;
-    canvasRef.current.height = maxHeight;
-
-    // The proportion the image will need to grow / shrink in order to fit in the chosen preset
-    const sizeProportion = getSizeProportion(
-      imageWidth,
-      imageHeight,
-      maxWidth,
-      maxHeight
-    );
-
-    const newImageWidth = imageWidth * sizeProportion;
-    const newImageHeight = imageHeight * sizeProportion;
-
-    const coords = getImageCanvasCoords(
-      maxWidth,
-      maxHeight,
-      newImageWidth,
-      newImageHeight
-    );
-
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, maxWidth, maxHeight);
-    ctx.drawImage(image, coords.x, coords.y, newImageWidth, newImageHeight);
+    drawImageOnCanvas({ canvasRef, image, canvasDimensions, backgroundColor });
   }, [image, canvasDimensions, backgroundColor]);
 
   return {

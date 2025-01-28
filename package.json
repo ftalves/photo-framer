@@ -8,7 +8,8 @@
     "static": "BUILD_DIR=docs next build && touch ./docs/.nojekyll",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
+    "test": "jest",
+    "prettier": "prettier --write ."
   },
   "dependencies": {
     "file-saver": "^2.0.5",
