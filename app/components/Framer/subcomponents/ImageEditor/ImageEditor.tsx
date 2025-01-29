@@ -8,6 +8,7 @@ import { useImageEditor } from './useImageEditor';
 interface EditorProps {
   image: HTMLImageElement;
   aspectRatio: AspectRatio;
+  onRemove: () => void;
 }
 
 export const ImageEditor = forwardRef(
@@ -53,6 +54,7 @@ export const ImageEditor = forwardRef(
               }
             }
           }}
+          onClick={props.onRemove}
           width={0}
           height={0}
           className="w-1/3"

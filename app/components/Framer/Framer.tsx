@@ -21,24 +21,24 @@ const dropzoneStyle = {
 };
 
 export const Framer = () => {
-  const [images, setImages] = useState<HTMLImageElement[]>();
+  const [images, setImages] = useState<HTMLImageElement[]>([]);
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('');
   const [format, setFormat] = useState<ExportFormat>('jpeg');
 
   const canvasRefs = useRef<HTMLCanvasElement[]>([]);
 
   const handleUpload = (acceptedFiles: File[]) => {
-    const images = acceptedFiles.map((file) => {
+    const newImages = acceptedFiles.map((file) => {
       const image = new Image();
       image.src = URL.createObjectURL(file);
       return image;
     });
 
-    setImages(images);
+    setImages([...images, ...newImages]);
   };
 
   useEffect(() => {
-    canvasRefs.current = canvasRefs.current.slice(0, images?.length || 0);
+    canvasRefs.current = canvasRefs.current.slice(0, images.length || 0);
   }, [images]);
 
   const handleDownload = () => {
@@ -97,11 +97,12 @@ export const Framer = () => {
 
         <button onClick={handleDownload}>Download Edited Images</button>
 
-        {images?.map((image, i) => (
+        {images.map((image, i) => (
           <ImageEditor
             key={image.src}
             image={image}
             aspectRatio={aspectRatio}
+            onRemove={() => setImages(images.filter((({ src }) => src !== image.src)))}
             ref={(el: HTMLCanvasElement) => (canvasRefs.current[i] = el)}
           />
         ))}
