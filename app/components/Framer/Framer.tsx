@@ -5,9 +5,8 @@ import Dropzone from 'react-dropzone';
 import { saveAs } from 'file-saver';
 
 import { DROPZONE_TEST_ID } from '@/app/utils/testIds';
-import { MAP_EXPORT_FORMAT_TO_LABEL } from '@/app/utils/constants';
-import { AspectRatio, ExportFormat } from './types';
 import { ImageEditor } from './subcomponents';
+import { AspectRatio } from './types';
 
 const dropzoneStyle = {
   width: '100%',
@@ -20,10 +19,16 @@ const dropzoneStyle = {
   cursor: 'pointer',
 };
 
+type ImageItem = {
+  image: HTMLImageElement;
+  mimeType: string;
+  extension: string;
+};
+
 export const Framer = () => {
-  const [images, setImages] = useState<HTMLImageElement[]>([]);
+  const [images, setImages] = useState<ImageItem[]>([]);
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('');
-  const [format, setFormat] = useState<ExportFormat>('jpeg');
+  const [optimizeSize, setOptimizeSize] = useState(true);
 
   const canvasRefs = useRef<HTMLCanvasElement[]>([]);
 
@@ -31,7 +36,15 @@ export const Framer = () => {
     const newImages = acceptedFiles.map((file) => {
       const image = new Image();
       image.src = URL.createObjectURL(file);
-      return image;
+
+      const mimeType = file.type || 'image/png';
+      const extension = (
+        file.name.split('.').pop() ||
+        mimeType.split('/')[1] ||
+        'png'
+      ).toLowerCase();
+
+      return { image, mimeType, extension };
     });
 
     setImages([...images, ...newImages]);
@@ -42,13 +55,15 @@ export const Framer = () => {
   }, [images]);
 
   const handleDownload = () => {
-    canvasRefs.current.forEach((canvasRef) => {
-      //TODO: delegate to a web worker
+    canvasRefs.current.forEach((canvasRef, index) => {
+      const item = images[index];
+      if (!item) return;
+
       canvasRef.toBlob((blob) => {
         if (blob) {
-          saveAs(blob, `image.${format}}`);
+          saveAs(blob, `image.${item.extension}`);
         }
-      }, `image/${format}`);
+      }, item.mimeType);
     });
   };
 
@@ -81,28 +96,29 @@ export const Framer = () => {
           <option value="insta-square">Square</option>
         </select>
 
-        <label htmlFor={'format'}>Export Format</label>
-        <select
-          id="format"
-          onChange={(e) => setFormat(e.target.value as ExportFormat)}
-        >
-          {(Object.keys(MAP_EXPORT_FORMAT_TO_LABEL) as Array<ExportFormat>).map(
-            (format) => (
-              <option key={format} value={format}>
-                {MAP_EXPORT_FORMAT_TO_LABEL[format]}
-              </option>
-            )
-          )}
-        </select>
+        <label htmlFor="optimize-size">
+          <input
+            id="optimize-size"
+            type="checkbox"
+            checked={optimizeSize}
+            onChange={(e) => setOptimizeSize(e.target.checked)}
+          />
+          Optimize Image Size
+        </label>
 
         <button onClick={handleDownload}>Download Edited Images</button>
 
-        {images.map((image, i) => (
+        {images.map(({ image }, i) => (
           <ImageEditor
             key={image.src}
             image={image}
             aspectRatio={aspectRatio}
-            onRemove={() => setImages(images.filter((({ src }) => src !== image.src)))}
+            optimizeSize={optimizeSize}
+            onRemove={() =>
+              setImages(
+                images.filter(({ image: img }) => img.src !== image.src)
+              )
+            }
             ref={(el: HTMLCanvasElement) => (canvasRefs.current[i] = el)}
           />
         ))}

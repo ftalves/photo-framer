@@ -8,6 +8,7 @@ import { useImageEditor } from './useImageEditor';
 interface EditorProps {
   image: HTMLImageElement;
   aspectRatio: AspectRatio;
+  optimizeSize: boolean;
   onRemove: () => void;
 }
 
@@ -15,13 +16,10 @@ export const ImageEditor = forwardRef(
   (props: EditorProps, canvasRef: ForwardedRef<HTMLCanvasElement>) => {
     const myRef = useRef<HTMLCanvasElement | null>(null);
 
-    const {
-      imageDimensions,
-      lockProportions,
-      setLockProportions,
-      setWidth,
-      setHeight,
-    } = useImageEditor({ ...props, canvasRef: myRef });
+    const { imageDimensions } = useImageEditor({
+      ...props,
+      canvasRef: myRef,
+    });
 
     return (
       <div data-testid={IMAGE_EDITOR_TEST_ID} className="w-screen">
@@ -29,17 +27,12 @@ export const ImageEditor = forwardRef(
           <input
             type="number"
             value={imageDimensions.width || 0}
-            onChange={(e) => setWidth(Number(e.target.value))}
+            readOnly
           />
           <input
             type="number"
             value={imageDimensions.height || 0}
-            onChange={(e) => setHeight(Number(e.target.value))}
-          />
-          <input
-            type="checkbox"
-            checked={lockProportions}
-            onChange={() => setLockProportions(!lockProportions)}
+            readOnly
           />
         </div>
 
