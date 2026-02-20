@@ -94,8 +94,9 @@ export const Framer = () => {
           onChange={(e) => setAspectRatio(e.target.value as AspectRatio)}
           value={aspectRatio}
         >
-          <option value="insta-portrait">Portrait</option>
+          <option value="insta-portrait">Portrait / Post</option>
           <option value="insta-story">Story</option>
+          <option value="insta-landscape">Landscape</option>
           <option value="insta-square">Square</option>
         </select>
 
