@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import NextImage from 'next/image';
 import Dropzone from 'react-dropzone';
 import { saveAs } from 'file-saver';
+import JSZip from 'jszip';
 import { HexColorPicker } from 'react-colorful';
 
 import { DROPZONE_TEST_ID } from '@/app/utils/testIds';
@@ -52,17 +53,48 @@ export const Framer = () => {
     setImages((prev) => [...prev, ...newImages]);
   };
 
-  const handleDownload = () => {
-    canvasRefs.current.forEach((canvasRef, index) => {
-      const item = images[index];
-      if (!item) return;
+  const handleDownload = async () => {
+    const blobEntries = await Promise.all(
+      canvasRefs.current.map((canvasRef, index) => {
+        const item = images[index];
+        if (!item) return Promise.resolve(null);
 
-      canvasRef.toBlob((blob) => {
-        if (blob) {
-          saveAs(blob, `image.${item.extension}`);
-        }
-      }, item.mimeType);
+        return new Promise<{
+          blob: Blob;
+          extension: string;
+          mimeType: string;
+        } | null>((resolve) => {
+          canvasRef.toBlob((blob) => {
+            resolve(
+              blob
+                ? { blob, extension: item.extension, mimeType: item.mimeType }
+                : null
+            );
+          }, item.mimeType);
+        });
+      })
+    );
+
+    const valid = blobEntries.filter(Boolean) as {
+      blob: Blob;
+      extension: string;
+      mimeType: string;
+    }[];
+
+    if (valid.length === 0) return;
+
+    if (valid.length === 1) {
+      saveAs(valid[0].blob, `image.${valid[0].extension}`);
+      return;
+    }
+
+    const zip = new JSZip();
+    valid.forEach(({ blob, extension }, i) => {
+      zip.file(`image-${i + 1}.${extension}`, blob);
     });
+
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    saveAs(zipBlob, 'instaready-images.zip');
   };
 
   const handleRemove = (image: HTMLImageElement) => {
@@ -218,7 +250,7 @@ export const Framer = () => {
                 d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
               />
             </svg>
-            Download{images.length > 1 ? ` All (${images.length})` : ''}
+            Download{images.length > 1 ? ` all as ZIP (${images.length})` : ''}
           </button>
         )}
       </div>
