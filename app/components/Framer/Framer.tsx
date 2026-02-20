@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Dropzone from 'react-dropzone';
 import { saveAs } from 'file-saver';
 
 import { DROPZONE_TEST_ID } from '@/app/utils/testIds';
 import { ImageEditor } from './subcomponents';
-import { AspectRatio } from './types';
+import { AspectRatio, ImageItem } from './types';
 
 const dropzoneStyle = {
   width: '100%',
@@ -17,13 +17,6 @@ const dropzoneStyle = {
   alignItems: 'center',
   justifyContent: 'center',
   cursor: 'pointer',
-};
-
-type ImageItem = {
-  image: HTMLImageElement;
-  mimeType: string;
-  extension: string;
-  src: string;
 };
 
 export const Framer = () => {
@@ -50,10 +43,6 @@ export const Framer = () => {
 
     setImages((prev) => [...prev, ...newImages]);
   };
-
-  useEffect(() => {
-    canvasRefs.current = canvasRefs.current.slice(0, images.length || 0);
-  }, [images]);
 
   const handleDownload = () => {
     canvasRefs.current.forEach((canvasRef, index) => {

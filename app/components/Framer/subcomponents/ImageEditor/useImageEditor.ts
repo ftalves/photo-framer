@@ -1,8 +1,5 @@
-'use client';
-
 import { RefObject, useEffect, useState } from 'react';
 
-import { MAP_ASPECT_PRESET_TO_DIMENSIONS } from '@/app/utils/constants';
 import {
   computeDimensions,
   drawImageOnCanvas,
@@ -49,6 +46,8 @@ export const useImageEditor = (props: UseImageEditorProps) => {
   }, [aspectRatio, optimizeSize]);
 
   useEffect(() => {
+    if (!canvasDimensions.width || !canvasDimensions.height) return;
+
     drawImageOnCanvas({ canvasRef, image, canvasDimensions, backgroundColor });
     /** eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [image, canvasDimensions, backgroundColor]);

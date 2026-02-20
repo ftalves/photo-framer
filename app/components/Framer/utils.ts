@@ -42,8 +42,8 @@ export const drawImageOnCanvas = ({
     return;
   }
 
-  const imageWidth = image?.width || 0;
-  const imageHeight = image?.height || 0;
+  const imageWidth = image.width || 0;
+  const imageHeight = image.height || 0;
 
   // Max dimensions defined by aspect ratio preset
   const maxWidth = canvasDimensions.width || image.width;

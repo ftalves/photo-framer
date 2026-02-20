@@ -35,7 +35,7 @@ export const ImageEditor = forwardRef(
             if (canvasRef) {
               if (typeof canvasRef === 'function') {
                 canvasRef(node);
-              } else if (canvasRef) {
+              } else {
                 canvasRef.current = node;
               }
             }
