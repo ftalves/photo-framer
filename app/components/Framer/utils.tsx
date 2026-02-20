@@ -1,18 +1,6 @@
+import { MAP_ASPECT_PRESET_TO_DIMENSIONS } from '@/app/utils/constants';
 import { RefObject } from 'react';
-
-export const getProportionalWidth = (
-  height: number,
-  proportionRatio: number
-) => {
-  return Math.ceil(height * proportionRatio);
-};
-
-export const getProportionalHeight = (
-  width: number,
-  proportionRatio: number
-) => {
-  return Math.floor(width / proportionRatio);
-};
+import { AspectRatio } from './types';
 
 // The proportion the image will need to grow / shrink in order to fit in the chosen preset
 export const getSizeProportion = (
@@ -86,4 +74,39 @@ export const drawImageOnCanvas = ({
   ctx.fillStyle = backgroundColor;
   ctx.fillRect(0, 0, maxWidth, maxHeight);
   ctx.drawImage(image, coords.x, coords.y, newImageWidth, newImageHeight);
+};
+
+export const computeDimensions = (
+  img: HTMLImageElement,
+  ratio: AspectRatio,
+  optimize: boolean
+): { width: number; height: number } => {
+  if (!ratio) {
+    return { width: img.width, height: img.height };
+  }
+
+  if (optimize) {
+    const [w, h] = MAP_ASPECT_PRESET_TO_DIMENSIONS[ratio];
+    return { width: w, height: h };
+  }
+
+  // Fit image at native resolution into the target aspect ratio by adding
+  // the minimum border on the shorter axis.
+  const [targetW, targetH] = MAP_ASPECT_PRESET_TO_DIMENSIONS[ratio];
+  const targetRatio = targetW / targetH;
+  const imageRatio = img.width / img.height;
+
+  if (imageRatio > targetRatio) {
+    // Image is wider than target ratio — pad height
+    return {
+      width: img.width,
+      height: Math.round(img.width / targetRatio),
+    };
+  } else {
+    // Image is taller than target ratio — pad width
+    return {
+      width: Math.round(img.height * targetRatio),
+      height: img.height,
+    };
+  }
 };

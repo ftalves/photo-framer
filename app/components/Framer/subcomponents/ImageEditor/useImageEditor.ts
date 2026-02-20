@@ -3,7 +3,10 @@
 import { RefObject, useEffect, useState } from 'react';
 
 import { MAP_ASPECT_PRESET_TO_DIMENSIONS } from '@/app/utils/constants';
-import { drawImageOnCanvas } from '@/app/components/Framer/utils';
+import {
+  computeDimensions,
+  drawImageOnCanvas,
+} from '@/app/components/Framer/utils';
 import { AspectRatio } from '@/app/components/Framer/types';
 
 interface UseImageEditorProps {
@@ -22,41 +25,6 @@ export const useImageEditor = (props: UseImageEditorProps) => {
     height: 0,
   });
   const [backgroundColor, setBackgroundColor] = useState('#000');
-
-  const computeDimensions = (
-    img: HTMLImageElement,
-    ratio: AspectRatio,
-    optimize: boolean
-  ): { width: number; height: number } => {
-    if (!ratio) {
-      return { width: img.width, height: img.height };
-    }
-
-    if (optimize) {
-      const [w, h] = MAP_ASPECT_PRESET_TO_DIMENSIONS[ratio];
-      return { width: w, height: h };
-    }
-
-    // Fit image at native resolution into the target aspect ratio by adding
-    // the minimum border on the shorter axis.
-    const [targetW, targetH] = MAP_ASPECT_PRESET_TO_DIMENSIONS[ratio];
-    const targetRatio = targetW / targetH;
-    const imageRatio = img.width / img.height;
-
-    if (imageRatio > targetRatio) {
-      // Image is wider than target ratio — pad height
-      return {
-        width: img.width,
-        height: Math.round(img.width / targetRatio),
-      };
-    } else {
-      // Image is taller than target ratio — pad width
-      return {
-        width: Math.round(img.height * targetRatio),
-        height: img.height,
-      };
-    }
-  };
 
   useEffect(() => {
     image.onload = () => {
