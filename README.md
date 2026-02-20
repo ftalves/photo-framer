@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# InstaReady
 
-## Getting Started
+**Add clean borders to match Instagram ratios instantly.**
 
-First, run the development server:
+InstaReady is a browser-based image framing tool. Upload one or more photos, choose an Instagram aspect ratio, and the app will resize and pad each image with a border so it displays perfectly — no cropping, no distortion.
+
+## Features
+
+- **Drag & drop upload** — accepts PNG, JPG, and WEBP files
+- **Aspect ratio presets** — Portrait / Post (4:5), Story (9:16), and Square (1:1)
+- **Border color picker** — choose any color for the padding area
+- **Optimize Image Size** — when enabled, output dimensions match the official Instagram resolution for the chosen preset; when disabled, the image keeps its native resolution and only the minimum border is added
+- **Batch download** — single images are saved directly; multiple images are bundled into a `.zip` file
+
+## Running locally
+
+**Prerequisites:** Node.js 18+
 
 ```bash
+# 1. Install dependencies
+npm install
+
+# 2. Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Other scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+| Command | Description |
+|---|---|
+| `npm run build` | Production build |
+| `npm run start` | Start the production server |
+| `npm test` | Run the test suite |
+| `npm run lint` | Lint the codebase |
+| `npm run prettier` | Format all files with Prettier |
