@@ -48,7 +48,7 @@ export const Framer = () => {
       return { image, mimeType, extension, src };
     });
 
-    setImages([...images, ...newImages]);
+    setImages((prev) => [...prev, ...newImages]);
   };
 
   useEffect(() => {
@@ -66,6 +66,19 @@ export const Framer = () => {
         }
       }, item.mimeType);
     });
+  };
+
+  const handleRemove = (image: HTMLImageElement) => {
+    const newImages = [];
+
+    for (const item of images) {
+      if (item.image.src !== image.src) {
+        newImages.push(item);
+        URL.revokeObjectURL(item.src);
+      }
+    }
+
+    setImages(newImages);
   };
 
   return (
@@ -90,6 +103,7 @@ export const Framer = () => {
         <select
           id="aspect-ratio"
           onChange={(e) => setAspectRatio(e.target.value as AspectRatio)}
+          value={aspectRatio}
         >
           <option value="insta-portrait">Portrait</option>
           <option value="insta-story">Story</option>
@@ -115,11 +129,7 @@ export const Framer = () => {
             src={src}
             aspectRatio={aspectRatio}
             optimizeSize={optimizeSize}
-            onRemove={() =>
-              setImages(
-                images.filter(({ image: img }) => img.src !== image.src)
-              )
-            }
+            onRemove={() => handleRemove(image)}
             ref={(el: HTMLCanvasElement) => (canvasRefs.current[i] = el)}
           />
         ))}
