@@ -23,11 +23,12 @@ type ImageItem = {
   image: HTMLImageElement;
   mimeType: string;
   extension: string;
+  src: string;
 };
 
 export const Framer = () => {
   const [images, setImages] = useState<ImageItem[]>([]);
-  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('');
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('insta-portrait');
   const [optimizeSize, setOptimizeSize] = useState(true);
 
   const canvasRefs = useRef<HTMLCanvasElement[]>([]);
@@ -35,7 +36,7 @@ export const Framer = () => {
   const handleUpload = (acceptedFiles: File[]) => {
     const newImages = acceptedFiles.map((file) => {
       const image = new Image();
-      image.src = URL.createObjectURL(file);
+      const src = URL.createObjectURL(file);
 
       const mimeType = file.type || 'image/png';
       const extension = (
@@ -44,7 +45,7 @@ export const Framer = () => {
         'png'
       ).toLowerCase();
 
-      return { image, mimeType, extension };
+      return { image, mimeType, extension, src };
     });
 
     setImages([...images, ...newImages]);
@@ -90,9 +91,8 @@ export const Framer = () => {
           id="aspect-ratio"
           onChange={(e) => setAspectRatio(e.target.value as AspectRatio)}
         >
-          <option value="">Original</option>
-          <option value="insta-story">Story</option>
           <option value="insta-portrait">Portrait</option>
+          <option value="insta-story">Story</option>
           <option value="insta-square">Square</option>
         </select>
 
@@ -108,10 +108,11 @@ export const Framer = () => {
 
         <button onClick={handleDownload}>Download Edited Images</button>
 
-        {images.map(({ image }, i) => (
+        {images.map(({ image, src }, i) => (
           <ImageEditor
-            key={image.src}
+            key={src}
             image={image}
+            src={src}
             aspectRatio={aspectRatio}
             optimizeSize={optimizeSize}
             onRemove={() =>

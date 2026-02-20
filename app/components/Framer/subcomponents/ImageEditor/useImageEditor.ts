@@ -11,10 +11,11 @@ interface UseImageEditorProps {
   aspectRatio: AspectRatio;
   optimizeSize: boolean;
   canvasRef: RefObject<HTMLCanvasElement>;
+  src: string;
 }
 
 export const useImageEditor = (props: UseImageEditorProps) => {
-  const { image, aspectRatio, optimizeSize, canvasRef } = props;
+  const { image, aspectRatio, optimizeSize, canvasRef, src } = props;
 
   const [canvasDimensions, setCanvasDimensions] = useState({
     width: 0,
@@ -68,6 +69,8 @@ export const useImageEditor = (props: UseImageEditorProps) => {
         canvasRef.current?.getContext('2d')?.drawImage(image, 0, 0);
       }
     };
+
+    image.src = src;
     /** eslint-disable-next-line react-hooks/exhaustive-deps */
   }, []);
 
