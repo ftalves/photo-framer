@@ -10,6 +10,7 @@ interface EditorProps {
   src: string;
   aspectRatio: AspectRatio;
   optimizeSize: boolean;
+  borderColor: string;
   onRemove: () => void;
 }
 
@@ -25,10 +26,10 @@ export const ImageEditor = forwardRef(
     return (
       <div
         data-testid={IMAGE_EDITOR_TEST_ID}
-        className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
+        className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 shadow-sm"
       >
         {/* Canvas preview */}
-        <div className="flex items-center justify-center bg-gray-100 p-3">
+        <div className="flex items-center justify-center p-3">
           <canvas
             ref={(node) => {
               myRef.current = node;

@@ -1,9 +1,10 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import NextImage from 'next/image';
 import Dropzone from 'react-dropzone';
 import { saveAs } from 'file-saver';
+import { HexColorPicker } from 'react-colorful';
 
 import { DROPZONE_TEST_ID } from '@/app/utils/testIds';
 import { ImageEditor } from './subcomponents';
@@ -13,8 +14,25 @@ export const Framer = () => {
   const [images, setImages] = useState<ImageItem[]>([]);
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('insta-portrait');
   const [optimizeSize, setOptimizeSize] = useState(true);
+  const [borderColor, setBorderColor] = useState('#ffffff');
+  const [showColorPicker, setShowColorPicker] = useState(false);
 
+  const colorPickerRef = useRef<HTMLDivElement>(null);
   const canvasRefs = useRef<HTMLCanvasElement[]>([]);
+
+  // Close the color picker when clicking outside it
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        colorPickerRef.current &&
+        !colorPickerRef.current.contains(e.target as Node)
+      ) {
+        setShowColorPicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleUpload = (acceptedFiles: File[]) => {
     const newImages = acceptedFiles.map((file) => {
@@ -120,7 +138,7 @@ export const Framer = () => {
       </Dropzone>
 
       {/* Controls */}
-      <div className="mt-6 flex flex-wrap items-center gap-4 rounded-xl border border-gray-200 bg-white px-5 py-4">
+      <div className="mt-6 flex flex-wrap items-center gap-4 rounded-xl border border-gray-200 px-5 py-4">
         <div className="flex items-center gap-2">
           <label
             htmlFor="aspect-ratio"
@@ -138,6 +156,31 @@ export const Framer = () => {
             <option value="insta-story">Story</option>
             <option value="insta-square">Square</option>
           </select>
+        </div>
+
+        {/* Border colour picker */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
+            Border Color
+          </span>
+          <div ref={colorPickerRef} className="relative">
+            <button
+              onClick={() => setShowColorPicker((v) => !v)}
+              className="h-7 w-7 rounded-md border-2 border-gray-300 shadow-sm ring-offset-1 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              style={{ backgroundColor: borderColor }}
+              aria-label="Pick border color"
+            />
+            {showColorPicker && (
+              <div className="absolute left-0 top-9 z-20 rounded-xl border border-gray-200 bg-white p-3 shadow-lg">
+                <HexColorPicker color={borderColor} onChange={setBorderColor} />
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-xs text-gray-400 font-mono uppercase">
+                    {borderColor}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <label
@@ -190,6 +233,7 @@ export const Framer = () => {
               src={src}
               aspectRatio={aspectRatio}
               optimizeSize={optimizeSize}
+              borderColor={borderColor}
               onRemove={() => handleRemove(image)}
               ref={(el: HTMLCanvasElement) => (canvasRefs.current[i] = el)}
             />

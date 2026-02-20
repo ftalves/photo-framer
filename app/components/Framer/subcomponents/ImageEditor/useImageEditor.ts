@@ -10,18 +10,19 @@ interface UseImageEditorProps {
   image: HTMLImageElement;
   aspectRatio: AspectRatio;
   optimizeSize: boolean;
+  borderColor: string;
   canvasRef: RefObject<HTMLCanvasElement>;
   src: string;
 }
 
 export const useImageEditor = (props: UseImageEditorProps) => {
-  const { image, aspectRatio, optimizeSize, canvasRef, src } = props;
+  const { image, aspectRatio, optimizeSize, borderColor, canvasRef, src } =
+    props;
 
   const [canvasDimensions, setCanvasDimensions] = useState({
     width: 0,
     height: 0,
   });
-  const [backgroundColor, setBackgroundColor] = useState('#000');
 
   useEffect(() => {
     image.onload = () => {
@@ -48,9 +49,14 @@ export const useImageEditor = (props: UseImageEditorProps) => {
   useEffect(() => {
     if (!canvasDimensions.width || !canvasDimensions.height) return;
 
-    drawImageOnCanvas({ canvasRef, image, canvasDimensions, backgroundColor });
+    drawImageOnCanvas({
+      canvasRef,
+      image,
+      canvasDimensions,
+      backgroundColor: borderColor,
+    });
     /** eslint-disable-next-line react-hooks/exhaustive-deps */
-  }, [image, canvasDimensions, backgroundColor]);
+  }, [image, canvasDimensions, borderColor]);
 
   return {
     image,
