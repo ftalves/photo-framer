@@ -23,28 +23,55 @@ export const ImageEditor = forwardRef(
     });
 
     return (
-      <div data-testid={IMAGE_EDITOR_TEST_ID} className="w-screen">
-        <div>
-          <input type="number" value={imageDimensions.width || 0} readOnly />
-          <input type="number" value={imageDimensions.height || 0} readOnly />
+      <div
+        data-testid={IMAGE_EDITOR_TEST_ID}
+        className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
+      >
+        {/* Canvas preview */}
+        <div className="flex items-center justify-center bg-gray-100 p-3">
+          <canvas
+            ref={(node) => {
+              myRef.current = node;
+              if (canvasRef) {
+                if (typeof canvasRef === 'function') {
+                  canvasRef(node);
+                } else {
+                  canvasRef.current = node;
+                }
+              }
+            }}
+            width={0}
+            height={0}
+            className="max-h-64 w-auto rounded object-contain shadow-sm"
+          />
         </div>
 
-        <canvas
-          ref={(node) => {
-            myRef.current = node;
-            if (canvasRef) {
-              if (typeof canvasRef === 'function') {
-                canvasRef(node);
-              } else {
-                canvasRef.current = node;
-              }
-            }
-          }}
-          onClick={props.onRemove}
-          width={0}
-          height={0}
-          className="w-1/3"
-        />
+        {/* Footer: dimensions + remove */}
+        <div className="flex items-center justify-between px-4 py-3">
+          <span className="text-xs font-medium text-gray-400 tabular-nums">
+            {imageDimensions.width} &times; {imageDimensions.height}
+          </span>
+          <button
+            onClick={props.onRemove}
+            className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+          >
+            <svg
+              className="h-3.5 w-3.5"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+            Remove
+          </button>
+        </div>
       </div>
     );
   }

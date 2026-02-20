@@ -2,7 +2,7 @@ import { Framer } from './components/Framer';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-row p-24">
+    <main className="min-h-screen bg-gray-50">
       <Framer />
     </main>
   );
