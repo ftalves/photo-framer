@@ -117,7 +117,7 @@ export const Framer = () => {
       <header className="mb-10 mt-5 flex flex-col items-center gap-4 ">
         <div className="max-w-3xl">
           <NextImage
-            src="/logo.png"
+            src="/instaready/logo.png"
             alt="InstaReady"
             width={220}
             height={60}
