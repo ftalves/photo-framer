@@ -1,6 +1,6 @@
 # InstaReady
 
-**Add clean borders to match Instagram ratios, instantly.**
+**Add clean borders to match Instagram ratios instantly.**
 
 InstaReady is a browser-based image framing tool. Upload one or more photos, choose an Instagram aspect ratio, and the app will resize and pad each image with a border so it displays perfectly — no cropping, no distortion.
 

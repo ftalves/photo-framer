@@ -126,7 +126,7 @@ export const Framer = () => {
           />
         </div>
         <p className="text-xl text-gray-500 text-center">
-          Add clean borders to match Instagram ratios, instantly.
+          Add clean borders to match Instagram ratios instantly.
         </p>
       </header>
 
