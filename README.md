@@ -1,6 +1,6 @@
 # InstaReady
 
-**Add clean borders to match Instagram ratios instantly.**
+**Add clean borders to match Instagram ratios, instantly.**
 
 InstaReady is a browser-based image framing tool. Upload one or more photos, choose an Instagram aspect ratio, and the app will resize and pad each image with a border so it displays perfectly — no cropping, no distortion.
 
@@ -28,10 +28,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Other scripts
 
-| Command | Description |
-|---|---|
-| `npm run build` | Production build |
-| `npm run start` | Start the production server |
-| `npm test` | Run the test suite |
-| `npm run lint` | Lint the codebase |
+| Command            | Description                    |
+| ------------------ | ------------------------------ |
+| `npm run build`    | Production build               |
+| `npm run start`    | Start the production server    |
+| `npm test`         | Run the test suite             |
+| `npm run lint`     | Lint the codebase              |
 | `npm run prettier` | Format all files with Prettier |

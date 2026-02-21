@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'InstaReady',
-  description: 'Add clean borders to match Instagram ratios instantly.',
+  description: 'Add clean borders to match Instagram ratios, instantly.',
 };
 
 export default function RootLayout({
