@@ -3,7 +3,7 @@ const nextConfig = {
   output: 'export',
   images: { unoptimized: true },
   distDir: process.env.BUILD_DIR || '.next',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/photo-framer' : '/',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/instaready' : '/',
 };
 
 module.exports = nextConfig;
